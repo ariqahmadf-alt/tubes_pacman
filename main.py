@@ -56,7 +56,7 @@ class Ghost:
 
 
 points = [
-    # red
+    # top-left
     (310, 290),
     (310, 215),
     (240, 215),
@@ -72,6 +72,23 @@ points = [
     # (170, 140),
     (240, 355),
     (240, 290),
+    # top-right
+    (385, 290),
+    (385, 215),
+    (450, 215),
+    (450, 140),
+    (385, 140),
+    (385, 50),
+    (450, 50),
+    (530, 50),
+    (640, 50),
+    (640, 140),
+    (640, 215),
+    (530, 215),
+    (530, 355),
+    # (530, 140),
+    (450, 355),
+    (450, 290),
 ]
 
 # initialize maze
@@ -89,7 +106,7 @@ for i in range(4):
 
 def draw_points(screen):
     # draw all points (debugging)
-    interval = 16
+    interval = 15
     for p in range(len(points)):
         if p < interval * 1:
             col = min(p / interval * 1 * 255 + 50, 255)
