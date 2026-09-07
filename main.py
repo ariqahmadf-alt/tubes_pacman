@@ -6,28 +6,43 @@ class Ghost:
     pos = pygame.Vector2(0, 0)
     sprites = []
 
+    # direction (1-4, up left down right)
+    dir = 0
+
     # next point index - which point this ghost is currently going to
     npi = 0
 
     def ai(self):
-        # move ghost to their npi
-        if self.pos.x > points[blinky.npi][0]:
-            self.pos.x -= 1
-        else:
-            self.pos.x += 1
+        # current point
+        point = points[self.npi]
 
-        if self.pos.y > points[blinky.npi][1]:
-            self.pos.y -= 1
-        else:
-            self.pos.y += 1
+        # move ghost to their npi
+        #
+        # when moving, always check against ghost and point pos to ensure
+        # that ghost lands on the point instead of overshooting
+        speed = 1
+        if self.pos.x > point[0]:
+            self.pos.x -= min(speed, abs(point[0] - self.pos.x))
+        elif self.pos.x < point[0]:
+            self.pos.x += min(speed, abs(point[0] - self.pos.x))
+
+        if self.pos.y > point[1]:
+            self.pos.y -= min(speed, abs(point[1] - self.pos.y))
+        elif self.pos.y < point[1]:
+            self.pos.y += min(speed, abs(point[1] - self.pos.y))
 
         # move to next point if ghost is close to its current
+        if abs(point[0] - self.pos.x) + abs(point[1] - self.pos.y) < 1:
+            self.npi += 1
 
     def draw(self, screen):
-        # draw ghosts
+        sprite = self.sprites[self.dir]
         scaled = pygame.transform.scale(
-            self.sprites[0],
-            (self.sprites[0].get_width() * 3, self.sprites[0].get_height() * 3),
+            sprite,
+            (
+                sprite.get_width() * 3,
+                sprite.get_height() * 3,
+            ),
         )
         rect = scaled.get_rect()
         rect.x = self.pos.x - rect.height / 2
