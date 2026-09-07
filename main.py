@@ -6,7 +6,7 @@ class Ghost:
     pos = pygame.Vector2(0, 0)
     sprites = []
 
-    # direction (1-4, up left down right)
+    # direction (1-4, right left up down)
     dir = 0
 
     # next point index - which point this ghost is currently going to
@@ -20,16 +20,20 @@ class Ghost:
         #
         # when moving, always check against ghost and point pos to ensure
         # that ghost lands on the point instead of overshooting
-        speed = 1
+        speed = 3
         if self.pos.x > point[0]:
             self.pos.x -= min(speed, abs(point[0] - self.pos.x))
+            self.dir = 1
         elif self.pos.x < point[0]:
             self.pos.x += min(speed, abs(point[0] - self.pos.x))
+            self.dir = 0
 
         if self.pos.y > point[1]:
             self.pos.y -= min(speed, abs(point[1] - self.pos.y))
+            self.dir = 2
         elif self.pos.y < point[1]:
             self.pos.y += min(speed, abs(point[1] - self.pos.y))
+            self.dir = 3
 
         # move to next point if ghost is close to its current
         if abs(point[0] - self.pos.x) + abs(point[1] - self.pos.y) < 1:
