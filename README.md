@@ -1,6 +1,6 @@
 # Tubes Pacman
 
-This is the tubes (tugas besar) for Kecedarsan Buatan (FPMIPA).
+This is the tubes (tugas besar) for Kecedarsan Buatan (Ilmu Komputer FPMIPA).
 
 ## Architecture
 
