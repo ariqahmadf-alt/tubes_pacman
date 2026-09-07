@@ -38,6 +38,7 @@ class Ghost:
         # move to next point if ghost is close to its current
         if abs(point[0] - self.pos.x) + abs(point[1] - self.pos.y) < 1:
             self.npi += 1
+            print(self.npi)
 
     def draw(self, screen):
         sprite = self.sprites[self.dir]
@@ -56,12 +57,10 @@ class Ghost:
 
 points = [
     # red
-    (350, 290),
-    (390, 290),
-    (390, 215),
-    (450, 215),
-    (450, 140),
-    (380, 140),
+    (310, 290),
+    (310, 215),
+    (240, 215),
+    (240, 140),
     (310, 140),
     (310, 50),
     (170, 50),
@@ -69,14 +68,10 @@ points = [
     (50, 140),
     (50, 215),
     (170, 215),
-    (170, 140),
-    # yellow
-    (240, 140),
-    (240, 215),
-    (310, 215),
-    (310, 290),
-    (240, 290),
+    (170, 355),
+    # (170, 140),
     (240, 355),
+    (240, 290),
 ]
 
 # initialize maze
@@ -94,10 +89,10 @@ for i in range(4):
 
 def draw_points(screen):
     # draw all points (debugging)
-    interval = 15
+    interval = 16
     for p in range(len(points)):
         if p < interval * 1:
-            col = min(p / interval * 1 * 255 + 20, 255)
+            col = min(p / interval * 1 * 255 + 50, 255)
             pygame.draw.circle(screen, (col, 0, 0), points[p], 5, 2)
         elif p < interval * 2:
             col = min(p / interval * 2 * 255 + 10, 255)
@@ -129,7 +124,7 @@ async def main():
         draw_points(screen)
 
         pygame.display.flip()
-        # print(pygame.mouse.get_pos())
+        print(pygame.mouse.get_pos())
 
         clock.tick(60)
         # 3. Yield control to the browser loop so it doesn't freeze
