@@ -23,8 +23,27 @@ points = [
     (310, 215),
     (310, 290),
     (240, 290),
-    (240, 355)
+    (240, 355),
 ]
+
+# initialize maze
+maze = pygame.image.load("maze.png")
+maze_rect = maze.get_rect()
+maze_rect.topleft = (10, 10)
+
+
+# initialize blinky
+class Ghost:
+    pos = pygame.Vector2(0, 0)
+    sprites = []
+    next_point = 0
+
+
+blinky = Ghost()
+# starting pos
+blinky.pos = pygame.Vector2(320, 325)
+for i in range(4):
+    blinky.sprites.append(pygame.image.load(f"blinky/blinky_{i}.png"))
 
 
 async def main():
@@ -32,23 +51,6 @@ async def main():
     screen = pygame.display.set_mode((800, 800))
     clock = pygame.time.Clock()
     running = True
-
-    # initialize maze
-    maze = pygame.image.load("maze.png")
-    maze_rect = maze.get_rect()
-    maze_rect.topleft = (10, 10)
-
-    # initialize blinky
-    class Ghost:
-        pos = pygame.Vector2(0, 0)
-        sprites = []
-        next_point = 0
-
-    blinky = Ghost()
-    # starting pos
-    blinky.pos = pygame.Vector2(320, 325)
-    for i in range(4):
-        blinky.sprites.append(pygame.image.load(f"blinky/blinky_{i}.png"))
 
     while running:
         for event in pygame.event.get():
