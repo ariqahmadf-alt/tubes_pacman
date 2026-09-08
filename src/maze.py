@@ -1,6 +1,7 @@
 import pygame
 import config
 import os
+from copy import deepcopy
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 # initialize maze
@@ -16,10 +17,10 @@ if config.maze_type == 2:
 class Point:
     pos: pygame.Vector2
     wall = True
-    right = (-1, -1)
-    left = (-1, -1)
-    top = (-1, -1)
-    bottom = (-1, -1)
+    right: Point
+    left: Point
+    top: Point
+    bottom: Point
 
     def __init__(self, pos, wall):
         self.pos = pygame.Vector2(pos[0], pos[1])
@@ -27,6 +28,13 @@ class Point:
 
     def print(self):
         print(self.pos, self.right, self.left, self.top, self.bottom, self.wall)
+
+    def spos(self):
+        pos = deepcopy(self.pos)
+        pos *= config.maze_scale
+        pos.x += config.maze_scale / 2
+        pos.y += config.maze_scale / 2
+        return pos
 
 
 points = []
@@ -46,13 +54,13 @@ for y in range(img.height):
         # add this point as a neighbor to the left one, and vice versa
         left_point = row[x - 1]
         if x > 0 and not left_point.wall and left_point.pos.x == row[x].pos.x - 1:
-            row[x - 1].right = (x, y)
-            row[x].left = (x - 1, y)
+            row[x - 1].right = row[x]
+            row[x].left = row[x - 1]
 
         # add this point as a neighbor to the top one, and vice versa
         top_point = points[y - 1][x]
         if y > 0 and not top_point.wall and top_point.pos.y == row[x].pos.y - 1:
-            points[y - 1][x].bottom = (x, y)
-            row[x].top = (x, y - 1)
+            points[y - 1][x].bottom = row[x]
+            row[x].top = points[y - 1][x]
 
     points.append(row)

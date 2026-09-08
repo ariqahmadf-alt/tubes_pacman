@@ -10,6 +10,10 @@ path = [(0, 0), (0, 1), (0, 2), (0, 3)]
 ROOT = os.path.dirname(os.path.abspath(__file__))
 
 
+def dist(p1, p2):
+    return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
+
+
 class Ghost:
     pos = pygame.Vector2(0, 0)
     sprites = []
@@ -17,42 +21,92 @@ class Ghost:
     # direction (1-4, right left up down)
     dir = 0
 
-    # next point index - which point this ghost is currently going to
-    npi = (1, 1)
+    # the points to traverse
+    path = [maze.points[1][1]]
+    last_point: Point
+
+    blacklist = []
 
     def ai(self):
+        if len(self.path) == 0:
+            self.path = [self.last_point]
+
         # current point
-        point = deepcopy(maze.points[self.npi[1]][self.npi[0]])
-        point.pos *= config.maze_scale
-        point.pos.x += config.maze_scale / 2
-        point.pos.y += config.maze_scale / 2
+        point = deepcopy(self.path[0])
 
         # move ghost to their npi
         #
         # when moving, always check against ghost and point pos to ensure
         # that ghost lands on the point instead of overshooting
-        if self.pos.x > point.pos.x:
-            self.pos.x -= min(config.ghost_speed, abs(point.pos.x - self.pos.x))
+        if self.pos.x > point.spos().x:
+            self.pos.x -= min(config.ghost_speed, abs(point.spos().x - self.pos.x))
             self.dir = 1
-        elif self.pos.x < point.pos.x:
-            self.pos.x += min(config.ghost_speed, abs(point.pos.x - self.pos.x))
+        elif self.pos.x < point.spos().x:
+            self.pos.x += min(config.ghost_speed, abs(point.spos().x - self.pos.x))
             self.dir = 0
 
-        if self.pos.y > point.pos.y:
-            self.pos.y -= min(config.ghost_speed, abs(point.pos.y - self.pos.y))
+        if self.pos.y > point.spos().y:
+            self.pos.y -= min(config.ghost_speed, abs(point.spos().y - self.pos.y))
             self.dir = 2
-        elif self.pos.y < point.pos.y:
-            self.pos.y += min(config.ghost_speed, abs(point.pos.y - self.pos.y))
+        elif self.pos.y < point.spos().y:
+            self.pos.y += min(config.ghost_speed, abs(point.spos().y - self.pos.y))
             self.dir = 3
 
         # move to next point if ghost is close to its current
-        if abs(point.pos.x - self.pos.x) + abs(point.pos.y - self.pos.y) < 1:
-            if not maze.points[point.right[1]][point.right[0]].wall:
-                self.npi = (point.right[0], point.right[1])
-            elif not maze.points[point.bottom[1]][point.bottom[0]].wall:
-                self.npi = (point.bottom[0], point.bottom[1])
-            elif not maze.points[point.left[1]][point.left[0]].wall:
-                self.npi = (point.left[0], point.left[1])
+        if dist(point.spos(), self.pos) < 1:
+            self.last_point = deepcopy(self.path[0])
+            self.path = []
+            self.get_closest_point(self.last_point)
+            # if not maze.points[point.right[1]][point.right[0]].wall:
+            #     self.npi = (point.right[0], point.right[1])
+            # elif not maze.points[point.bottom[1]][point.bottom[0]].wall:
+            #     self.npi = (point.bottom[0], point.bottom[1])
+            # elif not maze.points[point.left[1]][point.left[0]].wall:
+            #     self.npi = (point.left[0], point.left[1])
+
+    def check_closest_point(self, dir, next_point, closest):
+        mouse = pygame.mouse.get_pos()
+
+        if hasattr(next_point, dir):
+            distance = dist(mouse, next_point.right.spos())
+            if distance < closest:
+                closest_point = next_point.right
+                closest = dist(mouse, closest_point.spos())
+
+    def get_closest_point(self, next_point):
+        mouse = pygame.mouse.get_pos()
+
+        # find next point's closest neighbor to target
+        closest_point = next_point
+        closest = dist(mouse, closest_point.spos())
+
+        if hasattr(next_point, "right"):
+            distance = dist(mouse, next_point.right.spos())
+            if distance < closest:
+                closest_point = next_point.right
+                closest = dist(mouse, closest_point.spos())
+
+        if hasattr(next_point, "left"):
+            distance = dist(mouse, next_point.left.spos())
+            if distance < closest:
+                closest_point = next_point.left
+                closest = dist(mouse, closest_point.spos())
+
+        if hasattr(next_point, "top"):
+            distance = dist(mouse, next_point.top.spos())
+            if distance < closest:
+                closest_point = next_point.top
+                closest = dist(mouse, closest_point.spos())
+
+        if hasattr(next_point, "bottom"):
+            distance = dist(mouse, next_point.bottom.spos())
+            if distance < closest:
+                closest_point = next_point.bottom
+                closest = dist(mouse, closest_point.spos())
+
+        if closest_point != next_point:
+            self.path.append(closest_point)
+            self.get_closest_point(closest_point)
 
     def draw(self, screen):
         sprite = self.sprites[self.dir]
