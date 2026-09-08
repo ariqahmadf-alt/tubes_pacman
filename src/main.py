@@ -70,7 +70,7 @@ class Ghost:
 blinky = Ghost()
 blinky.pos = pygame.Vector2(maze.points[0][0].pos.x, maze.points[0][0].pos.y)
 for i in range(4):
-    blinky.sprites.append(pygame.image.load(f"blinky/blinky_{i}.png"))
+    blinky.sprites.append(pygame.image.load(f"../assets/blinky/blinky_{i}.png"))
 
 
 def draw_points(screen):

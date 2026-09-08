@@ -2,7 +2,7 @@ import pygame
 import config
 
 # initialize maze
-img = pygame.image.load(f"maze{config.maze_type}.png")
+img = pygame.image.load(f"../assets/maze{config.maze_type}.png")
 rect = img.get_rect()
 rect.topleft = (0, 0)
 
