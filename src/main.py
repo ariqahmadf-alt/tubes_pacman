@@ -56,8 +56,8 @@ class Ghost:
         scaled = pygame.transform.scale(
             sprite,
             (
-                sprite.get_width() * config.maze_scale / 15,
-                sprite.get_height() * config.maze_scale / 15,
+                sprite.get_width() * config.maze_scale / 10,
+                sprite.get_height() * config.maze_scale / 10,
             ),
         )
         rect = scaled.get_rect()
