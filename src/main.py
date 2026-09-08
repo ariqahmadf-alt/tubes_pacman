@@ -84,7 +84,7 @@ def draw_points(screen):
             pos = maze.points[y][x].pos * config.maze_scale
             pos.x += config.maze_scale / 2
             pos.y += config.maze_scale / 2
-            pygame.draw.circle(screen, (0, 0, 150), pos, 5, 2)
+            pygame.draw.circle(screen, "#dda49c", pos, 3, 5)
 
 
 async def main():
