@@ -1,3 +1,4 @@
+import os
 import pygame
 import asyncio
 from copy import deepcopy
@@ -5,6 +6,8 @@ import config
 import maze
 
 path = [(0, 0), (0, 1), (0, 2), (0, 3)]
+
+ROOT = os.path.dirname(os.path.abspath(__file__))
 
 
 class Ghost:
@@ -70,7 +73,7 @@ class Ghost:
 blinky = Ghost()
 blinky.pos = pygame.Vector2(maze.points[0][0].pos.x, maze.points[0][0].pos.y)
 for i in range(4):
-    blinky.sprites.append(pygame.image.load(f"../assets/blinky/blinky_{i}.png"))
+    blinky.sprites.append(pygame.image.load(f"{ROOT}/assets/blinky/blinky_{i}.png"))
 
 
 def draw_points(screen):
@@ -118,7 +121,6 @@ async def main():
         # print(pygame.mouse.get_pos())
 
         clock.tick(60)
-        # 3. Yield control to the browser loop so it doesn't freeze
         await asyncio.sleep(0)
 
 
