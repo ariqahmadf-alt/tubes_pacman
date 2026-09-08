@@ -20,7 +20,7 @@ class Ghost:
         #
         # when moving, always check against ghost and point pos to ensure
         # that ghost lands on the point instead of overshooting
-        speed = 3
+        speed = 0
         if self.pos.x > point[0]:
             self.pos.x -= min(speed, abs(point[0] - self.pos.x))
             self.dir = 1
@@ -69,9 +69,10 @@ points = [
     (50, 215),
     (170, 215),
     (170, 355),
-    # (170, 140),
+    (170, 140),  # middle
     (240, 355),
     (240, 290),
+    #
     # top-right
     (385, 290),
     (385, 215),
@@ -86,9 +87,47 @@ points = [
     (640, 215),
     (530, 215),
     (530, 355),
-    # (530, 140),
+    (530, 140),  # middle
     (450, 355),
     (450, 290),
+    #
+    # bottom left
+    (240, 430),  # fruit left
+    (240, 500),
+    (170, 500),
+    (50, 500),
+    (50, 575),
+    (90, 575),
+    (90, 645),
+    (50, 645),
+    (50, 710),
+    (310, 710),
+    (310, 645),
+    (240, 645),
+    (240, 575),
+    (300, 575),
+    (300, 500),
+    (170, 575),  # middle
+    (170, 645),  # middle
+    #
+    # bottom right
+    (450, 430),  # fruit right
+    (450, 500),
+    (385, 500),
+    (385, 575),
+    (450, 575),
+    (450, 645),
+    (385, 645),
+    (385, 710),
+    (640, 710),
+    (640, 645),
+    (595, 645),
+    (595, 575),
+    (640, 575),
+    (640, 500),
+    (530, 500),
+    (530, 575), # middle
+    (530, 645), # middle
 ]
 
 # initialize maze
@@ -114,6 +153,8 @@ def draw_points(screen):
         elif p < interval * 2:
             col = min(p / interval * 2 * 255 + 10, 255)
             pygame.draw.circle(screen, (col, col, 0), points[p], 5, 2)
+        else:
+            pygame.draw.circle(screen, (col, col, col), points[p], 5, 2)
 
 
 async def main():
