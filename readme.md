@@ -25,7 +25,12 @@ is considered:
 - **Black pixel** - free spot
 
 Neighbours are automatically set for each point (orthogonally) during
-generation.
+generation. Whenever a point is created, the following is checked:
+
+- Is there a point on the left side? If yes, set it as the left neighbor of this
+  point (and vice versa)
+- Is there a point on the top side? If yes, set it as the top neighbor of this
+  point (and vice versa)
 
 ![Simple maze layout. Points will be automatically generated based on all pixels](src/assets/maze0.png)
 
