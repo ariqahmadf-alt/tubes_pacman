@@ -13,6 +13,22 @@ The maze is filled with invisible points that ghosts use to determine their next
 position. These points are also used as nodes in a graph to determine the
 closest position to Pac-man.
 
+### Maze generation
+
+Ghosts navigate the maze using a set of automatically-generated, invisible
+points.
+
+These points are generated based on the maze image. Each pixel of the maze image
+is considered:
+
+- **White pixel** - wall
+- **Black pixel** - free spot
+
+Neighbours are automatically set for each point (orthogonally) during
+generation.
+
+![assets/maze0.png]
+
 _Everything after this is WIP and not yet implemented._
 
 Each ghost will use a different searching algorithm:
@@ -22,7 +38,7 @@ Each ghost will use a different searching algorithm:
 - Pinky (Pink) - BFS
 - Blinky (Red) - A\*
 
-# Configuring
+## Configuring
 
 The configuration file, `config.py`, provides a few settings to edit the
 simulation:
