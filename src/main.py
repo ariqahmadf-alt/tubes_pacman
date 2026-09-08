@@ -92,6 +92,7 @@ async def main():
     screen = pygame.display.set_mode((800, 800))
     clock = pygame.time.Clock()
     running = True
+    original_img_toggle = True
 
     while running:
         for event in pygame.event.get():
@@ -101,8 +102,12 @@ async def main():
         screen.fill("black")
 
         # draw maze
-        img_to_use = maze.img if config.maze_type != 2 else maze.original_img
-        divisor = 1.0 if config.maze_type != 2 else 8.0
+        if pygame.key.get_just_pressed()[pygame.K_SPACE]:
+            original_img_toggle = not original_img_toggle
+
+        use_original_img = config.maze_type != 2 or not original_img_toggle
+        img_to_use = maze.img if use_original_img else maze.original_img
+        divisor = 1.0 if use_original_img else 8.0
         final_img = pygame.transform.scale(
             img_to_use,
             (
