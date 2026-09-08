@@ -98,14 +98,17 @@ async def main():
         screen.fill("black")
 
         # draw maze
-        scaled = pygame.transform.scale(
-            maze.img,
+        img_to_use = maze.img if config.maze_type != 2 else maze.original_img
+        divisor = 1.0 if config.maze_type != 2 else 8.0
+        final_img = pygame.transform.scale(
+            img_to_use,
             (
-                maze.img.get_width() * config.maze_scale,
-                maze.img.get_height() * config.maze_scale,
+                img_to_use.get_width() * config.maze_scale / divisor,
+                img_to_use.get_height() * config.maze_scale / divisor,
             ),
         )
-        screen.blit(scaled, maze.rect)
+        screen.blit(final_img, maze.rect)
+
         draw_points(screen)
 
         blinky.ai()
