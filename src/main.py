@@ -1,14 +1,8 @@
 import pygame
 import asyncio
 from copy import deepcopy
-
-# import config from root
-import sys
-sys.path.insert(1, "..")
 import config
-
 import maze
-
 
 path = [(0, 0), (0, 1), (0, 2), (0, 3)]
 
