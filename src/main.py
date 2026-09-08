@@ -25,6 +25,15 @@ class Ghost:
     path = [maze.points[1][1]]
     last_point: Point
 
+    def __init__(self, point, name):
+        self.pos = pygame.Vector2(point.spos(), point.spos())
+        self.path = [point]
+        self.sprites = []
+        self.last_point = point
+        for i in range(4):
+            sprite = pygame.image.load(f"{ROOT}/assets/{name}/{name}_{i}.png")
+            self.sprites.append(sprite)
+
     def ai(self):
         # safeguard: stay at last point if there's no path
         if len(self.path) == 0:
@@ -114,11 +123,12 @@ class Ghost:
         screen.blit(scaled, rect)
 
 
-# initialize blinky
-blinky = Ghost()
-blinky.pos = pygame.Vector2(maze.points[0][0].pos.x, maze.points[0][0].pos.y)
-for i in range(4):
-    blinky.sprites.append(pygame.image.load(f"{ROOT}/assets/blinky/blinky_{i}.png"))
+# initialize ghosts
+ghosts = []
+ghosts.append(Ghost(maze.points[1][1], "blinky"))
+ghosts.append(Ghost(maze.points[1][26], "pinky"))
+ghosts.append(Ghost(maze.points[29][26], "inky"))
+ghosts.append(Ghost(maze.points[29][1], "clyde"))
 
 
 def draw_points(screen):
@@ -164,8 +174,9 @@ async def main():
 
         draw_points(screen)
 
-        blinky.ai()
-        blinky.draw(screen)
+        for ghost in ghosts:
+            ghost.ai()
+            ghost.draw(screen)
 
         pygame.display.flip()
         # print(pygame.mouse.get_pos())
