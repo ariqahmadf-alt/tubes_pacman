@@ -39,17 +39,17 @@ class Ghost:
         # that ghost lands on the point instead of overshooting
         if self.pos.x > point.spos().x:
             self.pos.x -= min(config.ghost_speed, abs(point.spos().x - self.pos.x))
-            self.dir = 1
+            self.dir = 2
         elif self.pos.x < point.spos().x:
             self.pos.x += min(config.ghost_speed, abs(point.spos().x - self.pos.x))
             self.dir = 0
 
         if self.pos.y > point.spos().y:
             self.pos.y -= min(config.ghost_speed, abs(point.spos().y - self.pos.y))
-            self.dir = 2
+            self.dir = 3
         elif self.pos.y < point.spos().y:
             self.pos.y += min(config.ghost_speed, abs(point.spos().y - self.pos.y))
-            self.dir = 3
+            self.dir = 1
 
         # move to next point if ghost is close to its current
         if dist(point.spos(), self.pos) < 1:
