@@ -27,7 +27,7 @@ is considered:
 Neighbours are automatically set for each point (orthogonally) during
 generation.
 
-![Simple maze layout. Points will be automatically generated based on all pixels](assets/maze0.png)
+![Simple maze layout. Points will be automatically generated based on all pixels](src/assets/maze0.png)
 
 _Everything after this is WIP and not yet implemented._
 
