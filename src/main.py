@@ -25,9 +25,8 @@ class Ghost:
     path = [maze.points[1][1]]
     last_point: Point
 
-    blacklist = []
-
     def ai(self):
+        # safeguard: stay at last point if there's no path
         if len(self.path) == 0:
             self.path = [self.last_point]
 
@@ -56,7 +55,7 @@ class Ghost:
         if dist(point.spos(), self.pos) < 1:
             self.last_point = deepcopy(self.path[0])
             self.path = []
-            self.get_closest_point(self.last_point)
+            self.create_path(self.last_point, pygame.mouse.get_pos())
             # if not maze.points[point.right[1]][point.right[0]].wall:
             #     self.npi = (point.right[0], point.right[1])
             # elif not maze.points[point.bottom[1]][point.bottom[0]].wall:
@@ -64,16 +63,8 @@ class Ghost:
             # elif not maze.points[point.left[1]][point.left[0]].wall:
             #     self.npi = (point.left[0], point.left[1])
 
-    def check_closest_point(self, dir, next_point, closest):
-        mouse = pygame.mouse.get_pos()
-
-        if hasattr(next_point, dir):
-            distance = dist(mouse, next_point.right.spos())
-            if distance < closest:
-                closest_point = next_point.right
-                closest = dist(mouse, closest_point.spos())
-
-    def get_closest_point(self, next_point):
+    # recursively find the closest point to target
+    def create_path(self, next_point, target):
         mouse = pygame.mouse.get_pos()
 
         # find next point's closest neighbor to target
@@ -106,7 +97,7 @@ class Ghost:
 
         if closest_point != next_point:
             self.path.append(closest_point)
-            self.get_closest_point(closest_point)
+            self.create_path(closest_point, mouse)
 
     def draw(self, screen):
         sprite = self.sprites[self.dir]
