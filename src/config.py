@@ -1,7 +1,6 @@
 # Type of maze to use.
-# 0 - Simple
-# 1 - Bigger
-# 2 - Original Pac-man layout
+# 0 - Pac-Man
+# 1 - Ms. Pac-Man 1
 maze_type = 1
 
 # Scale of the maze (and rest of the game).
