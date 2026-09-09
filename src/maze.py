@@ -36,6 +36,8 @@ class Point:
         return pos
 
     def set_queue_properties(self, start_pos, prio):
+        if self.prio != -1:
+            return
         self.dist_start = dist(self.spos(), start_pos)
         self.dist_target = dist(self.spos(), pygame.mouse.get_pos())
         self.prio = prio
