@@ -26,6 +26,10 @@ class Ghost:
     queue = []
     queue_curr = 0
 
+    # 0 - dummy AI
+    # 1 - UCS
+    ai_type = 0
+
     def __init__(self, point, name):
         self.pos = pygame.Vector2(point.spos(), point.spos())
         self.path = [point]
@@ -63,20 +67,24 @@ class Ghost:
 
         # move to next point if ghost is close to its current
         if dist(point.spos(), self.pos) < 1:
+
+            # prepare points for ghost AI
             for row in maze.points:
                 for point in row:
                     point.prio = -1
-
             self.last_point = deepcopy(self.path[0])
             self.last_point.prio = 0
 
-            self.path = []
-            self.queue = []
-            self.found = False
-            self.queue_curr = 0
-            self.ucs(self.last_point)
-
-            # self.last_point = maze.points[int(self.last_point.pos.y)+1][int(self.last_point.pos.x)]
+            # process AI based on type
+            match(self.ai_type):
+                case 0:
+                    self.last_point = deepcopy(self.path[0])
+                    self.path = []
+                    self.dummy(self.last_point, pygame.mouse.get_pos())
+                case 1:
+                    self.queue = []
+                    self.queue_curr = 0
+                    self.ucs(self.last_point)
 
     def ucs(self, point):
         if dist(pygame.mouse.get_pos(), point.spos()) < 30:
@@ -101,7 +109,7 @@ class Ghost:
         self.ucs(self.queue[self.queue_curr])
 
     # recursively find the closest point to target
-    def create_path(self, next_point, target):
+    def dummy(self, next_point, target):
         mouse = pygame.mouse.get_pos()
 
         # find next point's closest neighbor to target
@@ -134,7 +142,7 @@ class Ghost:
 
         if closest_point != next_point:
             self.path.append(closest_point)
-            self.create_path(closest_point, mouse)
+            self.dummy(closest_point, mouse)
 
     def draw(self, screen):
         sprite = self.sprites[self.dir]
