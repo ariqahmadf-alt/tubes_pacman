@@ -32,7 +32,7 @@ generation. Whenever a point is created, the following is checked:
 - Is there a point on the top side? If yes, set it as the top neighbor of this
   point (and vice versa)
 
-![Simple maze layout. Points will be automatically generated based on all pixels](src/assets/maze0.png)
+![The layout image used to generate the original Pac-Man maze](src/assets/maze0.png)
 
 _Everything after this is WIP and not yet implemented._
 
@@ -48,8 +48,9 @@ Each ghost will use a different searching algorithm:
 The configuration file, `config.py`, provides a few settings to edit the
 simulation:
 
-- `maze_type` - Changes the type of maze being used. Currently 3 are supported
-  (simple, big, original).
+- `maze_type` - Changes the type of maze being used. Currently 2 are supported:
+    - Pac-Man
+    - Ms. Pac-Man 1
 - `maze_scale` - Changes the size of everything in the simulation. Use if the
   maze type is too big for the screen.
 - `ghost_speed` - How fast all ghosts move. Can be set to 0 to freeze them.

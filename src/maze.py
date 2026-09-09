@@ -9,9 +9,7 @@ img = pygame.image.load(f"{ROOT}/assets/maze{config.maze_type}.png")
 rect = img.get_rect()
 rect.topleft = (0, 0)
 
-original_img = {}
-if config.maze_type == 2:
-    original_img = pygame.image.load(f"{ROOT}/assets/original_maze.png")
+maze_og_img = pygame.image.load(f"{ROOT}/assets/maze{config.maze_type}_og.png")
 
 
 class Point:

@@ -2,7 +2,7 @@
 # 0 - Simple
 # 1 - Bigger
 # 2 - Original Pac-man layout
-maze_type = 2
+maze_type = 1
 
 # Scale of the maze (and rest of the game).
 maze_scale = 20
