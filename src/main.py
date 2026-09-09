@@ -23,7 +23,8 @@ class Ghost:
 
     # the points to traverse
     path = [maze.points[1][1]]
-    last_point: Point
+    queue = []
+    queue_curr = 0
 
     def __init__(self, point, name):
         self.pos = pygame.Vector2(point.spos(), point.spos())
@@ -62,15 +63,42 @@ class Ghost:
 
         # move to next point if ghost is close to its current
         if dist(point.spos(), self.pos) < 1:
+            for row in maze.points:
+                for point in row:
+                    point.prio = -1
+
             self.last_point = deepcopy(self.path[0])
+            self.last_point.prio = 0
+
             self.path = []
-            self.create_path(self.last_point, pygame.mouse.get_pos())
-            # if not maze.points[point.right[1]][point.right[0]].wall:
-            #     self.npi = (point.right[0], point.right[1])
-            # elif not maze.points[point.bottom[1]][point.bottom[0]].wall:
-            #     self.npi = (point.bottom[0], point.bottom[1])
-            # elif not maze.points[point.left[1]][point.left[0]].wall:
-            #     self.npi = (point.left[0], point.left[1])
+            self.queue = []
+            self.found = False
+            self.queue_curr = 0
+            self.ucs(self.last_point)
+
+            # self.last_point = maze.points[int(self.last_point.pos.y)+1][int(self.last_point.pos.x)]
+
+    def ucs(self, point):
+        if dist(pygame.mouse.get_pos(), point.spos()) < 30:
+            self.target_point = point
+            return
+
+        point.add_to_queue(self.queue)
+
+        if hasattr(point, 'right'):
+            point.right.set_queue_properties(self.pos, point.prio+1)
+        if hasattr(point, 'left'):
+            point.left.set_queue_properties(self.pos, point.prio+1)
+        if hasattr(point, 'top'):
+            point.top.set_queue_properties(self.pos, point.prio+1)
+        if hasattr(point, 'bottom'):
+            point.bottom.set_queue_properties(self.pos, point.prio+1)
+
+        # go to the next point in the queue
+        self.queue_curr += 1
+        if self.queue_curr > len(self.queue) - 1:
+            return
+        self.ucs(self.queue[self.queue_curr])
 
     # recursively find the closest point to target
     def create_path(self, next_point, target):
@@ -122,24 +150,37 @@ class Ghost:
         rect.y = self.pos.y - rect.width / 2
         screen.blit(scaled, rect)
 
+    def draw_points(self, screen):
+        highest_prio = 1
+        for queue in self.queue:
+            highest_prio = max(highest_prio, queue.prio)
+        for y in range(len(maze.points)):
+            for x in range(len(maze.points[y])):
+                if maze.points[y][x].wall:
+                    continue
+                pos = deepcopy(maze.points[y][x].pos)
+
+                # use different color if this point is in the expanded list
+                col = "#dda49c"
+                if hasattr(self, 'target_point') and self.target_point.pos == pos:
+                    col = "green"
+                else:
+                    for queue in self.queue:
+                        if queue.pos == pos:
+                            col = (0, 0, (queue.prio / highest_prio) * 255)
+                pos *= config.maze_scale
+                pos.x += config.maze_scale / 2
+                pos.y += config.maze_scale / 2
+                # use different color if this point is in the expanded list
+                pygame.draw.circle(screen, col, pos, 3, 5)
+
 
 # initialize ghosts
 ghosts = []
-ghosts.append(Ghost(maze.points[1][1], "blinky"))
-ghosts.append(Ghost(maze.points[1][26], "pinky"))
-ghosts.append(Ghost(maze.points[29][26], "inky"))
-ghosts.append(Ghost(maze.points[29][1], "clyde"))
-
-
-def draw_points(screen):
-    for y in range(len(maze.points)):
-        for x in range(len(maze.points[y])):
-            if maze.points[y][x].wall:
-                continue
-            pos = maze.points[y][x].pos * config.maze_scale
-            pos.x += config.maze_scale / 2
-            pos.y += config.maze_scale / 2
-            pygame.draw.circle(screen, "#dda49c", pos, 3, 5)
+ghosts.append(Ghost(maze.points[4][6], "blinky"))
+# ghosts.append(Ghost(maze.points[1][26], "pinky"))
+# ghosts.append(Ghost(maze.points[29][26], "inky"))
+# ghosts.append(Ghost(maze.points[29][1], "clyde"))
 
 
 async def main():
@@ -171,7 +212,7 @@ async def main():
         )
         screen.blit(final_img, maze.rect)
 
-        draw_points(screen)
+        ghosts[0].draw_points(screen)
 
         for ghost in ghosts:
             ghost.ai()
