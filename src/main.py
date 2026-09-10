@@ -112,6 +112,19 @@ class Ghost:
                     if hasattr(self, "target_point"):
                         self.ucs_path(self.target_point)
                         self.path.reverse()
+                case 3:
+                    self.path = []
+                    self.queue = []
+                    self.queue_curr = 0
+                
+                    if hasattr(self, "target_point"):
+                        del self.target_point
+                
+                    self.greedy_explore(self.last_point)
+                
+                    if hasattr(self, "target_point"):
+                        self.ucs_path(self.target_point)
+                        self.path.reverse()
 
     # from GPT 5.6 (using main.py and maze.py as context)
     def astar_explore(self, start):
@@ -212,6 +225,56 @@ class Ghost:
                     heapq.heappush(
                         frontier,
                         (new_cost, next(tie_breaker), neighbor),
+                    )
+
+    def greedy_explore(self, start):
+        frontier = []
+        tie_breaker = count()
+        target_pos = pygame.mouse.get_pos()
+
+        start.prio = 0
+        self.queue = []
+
+        heuristic = lambda point: dist(point.spos(), target_pos)
+
+        heapq.heappush(
+            frontier,
+            (heuristic(start), next(tie_breaker), 0, start),
+        )
+
+        while frontier:
+            _, _, cost, point = heapq.heappop(frontier)
+
+            # Ignore stale entries after a cheaper route was found.
+            if cost != point.prio:
+                continue
+
+            self.queue.append(point)
+
+            if dist(target_pos, point.spos()) < 10:
+                self.target_point = point
+                return
+
+            neighbors = (
+                getattr(point, "right", None),
+                getattr(point, "left", None),
+                getattr(point, "top", None),
+                getattr(point, "bottom", None),
+            )
+
+            for neighbor in neighbors:
+                if neighbor is None:
+                    continue
+
+                new_cost = cost + 1
+
+                if neighbor.prio == -1 or new_cost < neighbor.prio:
+                    neighbor.prio = new_cost
+
+                    # Greedy best-first uses only h(n), unlike A*'s g(n) + h(n).
+                    heapq.heappush(
+                        frontier,
+                        (heuristic(neighbor), next(tie_breaker), new_cost, neighbor),
                     )
 
     def ucs_path(self, point):
