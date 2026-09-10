@@ -8,4 +8,4 @@ maze_scale = 20
 
 # How fast ghosts move.
 # Can be set to 0 to freeze them.
-ghost_speed = 1
+ghost_speed = 3

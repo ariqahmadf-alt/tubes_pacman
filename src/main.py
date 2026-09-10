@@ -99,8 +99,72 @@ class Ghost:
                         self.ucs_path(self.target_point)
                         self.path.reverse()
                         # print(self.path[0].pos)
+                case 2:
+                    self.path = []
+                    self.queue = []
+                    self.queue_curr = 0
 
-    # from copilot
+                    if hasattr(self, "target_point"):
+                        del self.target_point
+
+                    self.astar_explore(self.last_point)
+
+                    if hasattr(self, "target_point"):
+                        self.ucs_path(self.target_point)
+                        self.path.reverse()
+
+    # from GPT 5.6 (using main.py and maze.py as context)
+    def astar_explore(self, start):
+        frontier = []
+        tie_breaker = count()
+        target_pos = pygame.mouse.get_pos()
+
+        start.prio = 0
+        self.queue = []
+
+        heuristic = lambda point: dist(point.spos(), target_pos)
+
+        heapq.heappush(
+            frontier,
+            (heuristic(start), next(tie_breaker), 0, start),
+        )
+
+        while frontier:
+            _, _, cost, point = heapq.heappop(frontier)
+
+            # Ignore stale entries after a cheaper route was found.
+            if cost != point.prio:
+                continue
+
+            self.queue.append(point)
+
+            if dist(target_pos, point.spos()) < 10:
+                self.target_point = point
+                return
+
+            neighbors = (
+                getattr(point, "right", None),
+                getattr(point, "left", None),
+                getattr(point, "top", None),
+                getattr(point, "bottom", None),
+            )
+
+            for neighbor in neighbors:
+                if neighbor is None:
+                    continue
+
+                new_cost = cost + 1
+
+                if neighbor.prio == -1 or new_cost < neighbor.prio:
+                    neighbor.prio = new_cost
+                    priority = new_cost + heuristic(neighbor)
+
+                    heapq.heappush(
+                        frontier,
+                        (priority, next(tie_breaker), new_cost, neighbor),
+                    )
+
+    # from GPT 5.6 (using main.py and maze.py as context)
     # Osman's first attempt made a FIFO list by accident
     def ucs_explore(self, start):
         frontier = []
@@ -284,10 +348,22 @@ class Ghost:
 
 # initialize ghosts
 ghosts = []
-ghosts.append(Ghost(maze.points[4][6], "blinky", 0))
+ghosts.append(Ghost(maze.points[4][6], "blinky", 2))
 ghosts.append(Ghost(maze.points[1][26], "pinky", 1))
-ghosts.append(Ghost(maze.points[29][26], "inky", 2))
+ghosts.append(Ghost(maze.points[29][26], "inky", 0))
 ghosts.append(Ghost(maze.points[29][1], "clyde", 3))
+
+def draw_points(screen):
+    for y in range(len(maze.points)):
+        for x in range(len(maze.points[y])):
+            if maze.points[y][x].wall:
+                continue
+            pos = deepcopy(maze.points[y][x].pos)
+            col = "#dda49c"
+            pos *= config.maze_scale
+            pos.x += config.maze_scale / 2
+            pos.y += config.maze_scale / 2
+            pygame.draw.circle(screen, col, pos, 3, 5)
 
 
 async def main():
@@ -314,6 +390,8 @@ async def main():
             active_ghost = 2
         if pygame.key.get_just_pressed()[pygame.K_4]:
             active_ghost = 3
+        if pygame.key.get_just_pressed()[pygame.K_4]:
+            active_ghost = 4
 
         # draw maze
         if pygame.key.get_just_pressed()[pygame.K_SPACE]:
@@ -334,9 +412,15 @@ async def main():
         )
         screen.blit(final_img, maze.rect)
 
-        ghosts[active_ghost].draw_points(screen)
-        ghosts[active_ghost].ai()
-        ghosts[active_ghost].draw(screen)
+        if active_ghost != 4:
+            ghosts[active_ghost].draw_points(screen)
+            ghosts[active_ghost].ai()
+            ghosts[active_ghost].draw(screen)
+        else:
+            draw_points(screen)
+            for ghost in ghosts:
+                ghost.ai()
+                ghost.draw(screen)
 
         pygame.display.flip()
         # print(pygame.mouse.get_pos())
