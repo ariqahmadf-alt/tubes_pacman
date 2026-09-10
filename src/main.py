@@ -489,12 +489,14 @@ async def main():
                 running = False
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_1:
-                    active_ghost = 1
+                    active_ghost = 0
                 if event.key == pygame.K_2:
-                    active_ghost = 2
+                    active_ghost = 1
                 if event.key == pygame.K_3:
-                    active_ghost = 3
+                    active_ghost = 2
                 if event.key == pygame.K_4:
+                    active_ghost = 3
+                if event.key == pygame.K_5:
                     active_ghost = 4
                 if event.key == pygame.K_m:
                     maze_og_toggle = not maze_og_toggle
