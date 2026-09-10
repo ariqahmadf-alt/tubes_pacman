@@ -33,14 +33,14 @@ class Ghost:
 
     # 0 - dummy AI
     # 1 - UCS
-    ai_type = 1
+    ai_type = 0
 
-
-    def __init__(self, point, name):
+    def __init__(self, point, name, ai_type):
         self.pos = pygame.Vector2(point.spos(), point.spos())
         self.path = [point]
         self.sprites = []
         self.last_point = point
+        self.ai_type = ai_type
         for i in range(4):
             sprite = pygame.image.load(f"{ROOT}/assets/{name}/{name}_{i}.png")
             self.sprites.append(sprite)
@@ -78,26 +78,27 @@ class Ghost:
                 for x in range(len(maze.points[y])):
                     maze.points[y][x].prio = -1
 
-            self.last_point = maze.points[int(self.path[0].pos.y)][int(self.path[0].pos.x)]
+            self.last_point = maze.points[int(self.path[0].pos.y)][
+                int(self.path[0].pos.x)
+            ]
             self.last_point.prio = 0
 
             # process AI based on type
-            match(self.ai_type):
+            match self.ai_type:
                 case 0:
-                    self.last_point = deepcopy(self.path[0])
+                    self.path = []
                     self.dummy(self.last_point, pygame.mouse.get_pos())
                 case 1:
-                    self.queue = []
                     self.path = []
+                    self.queue = []
                     self.queue_curr = 0
                     if hasattr(self, "target_point"):
                         del self.target_point
                     self.ucs_explore(self.last_point)
-                    if hasattr(self, 'target_point'):
+                    if hasattr(self, "target_point"):
                         self.ucs_path(self.target_point)
                         self.path.reverse()
                         # print(self.path[0].pos)
-
 
     # from copilot
     # Osman's first attempt made a FIFO list by accident
@@ -153,27 +154,38 @@ class Ghost:
         next_point = point
         closest = point.prio
 
-        if hasattr(point, 'right'):
-            print("r", point.right.prio)
-        if hasattr(point, 'left'):
-            print("l", point.left.prio)
-        if hasattr(point, 'top'):
-            print("t", point.top.prio)
-        if hasattr(point, 'bottom'):
-            print("b", point.bottom.prio)
-        
+        # if hasattr(point, "right"):
+        #     print("r", point.right.prio)
+        # if hasattr(point, "left"):
+        #     print("l", point.left.prio)
+        # if hasattr(point, "top"):
+        #     print("t", point.top.prio)
+        # if hasattr(point, "bottom"):
+        #     print("b", point.bottom.prio)
 
         # go to neighbor with smallest prio
-        if hasattr(point, 'right') and point.right.prio != -1 and point.right.prio < closest:
+        if (
+            hasattr(point, "right")
+            and point.right.prio != -1
+            and point.right.prio < closest
+        ):
             next_point = point.right
             closest = point.right.prio
-        if hasattr(point, 'left') and point.left.prio != -1 and point.left.prio < closest:
+        if (
+            hasattr(point, "left")
+            and point.left.prio != -1
+            and point.left.prio < closest
+        ):
             next_point = point.left
             closest = point.left.prio
-        if hasattr(point, 'top') and point.top.prio != -1 and point.top.prio < closest:
+        if hasattr(point, "top") and point.top.prio != -1 and point.top.prio < closest:
             next_point = point.top
             closest = point.top.prio
-        if hasattr(point, 'bottom') and point.bottom.prio != -1 and point.bottom.prio < closest:
+        if (
+            hasattr(point, "bottom")
+            and point.bottom.prio != -1
+            and point.bottom.prio < closest
+        ):
             next_point = point.bottom
             closest = point.bottom.prio
 
@@ -215,6 +227,7 @@ class Ghost:
                 closest = dist(mouse, closest_point.spos())
 
         if closest_point != next_point:
+            closest_point.prio = next_point.prio + 1
             self.path.append(closest_point)
             self.dummy(closest_point, mouse)
 
@@ -246,15 +259,14 @@ class Ghost:
                     continue
                 pos = deepcopy(maze.points[y][x].pos)
 
-                # use different color if this point is in the expanded list
+                # use different points if this point is in the queue, path, or is target
                 col = "#dda49c"
-                if hasattr(self, 'target_point') and self.target_point.pos == pos:
+                if hasattr(self, "target_point") and self.target_point.pos == pos:
                     col = "green"
-
                 else:
                     for queue in self.queue:
                         if queue.pos == pos:
-                            col = "blue"
+                            col = "blue" if config.maze_type == 0 else "magenta"
                     for path in self.path:
                         if path.pos == pos:
                             col = "red"
@@ -272,10 +284,10 @@ class Ghost:
 
 # initialize ghosts
 ghosts = []
-ghosts.append(Ghost(maze.points[4][6], "blinky"))
-# ghosts.append(Ghost(maze.points[1][26], "pinky"))
-# ghosts.append(Ghost(maze.points[29][26], "inky"))
-# ghosts.append(Ghost(maze.points[29][1], "clyde"))
+ghosts.append(Ghost(maze.points[4][6], "blinky", 0))
+ghosts.append(Ghost(maze.points[1][26], "pinky", 1))
+ghosts.append(Ghost(maze.points[29][26], "inky", 2))
+ghosts.append(Ghost(maze.points[29][1], "clyde", 3))
 
 
 async def main():
@@ -284,6 +296,7 @@ async def main():
     clock = pygame.time.Clock()
     running = True
     maze_og_toggle = True
+    active_ghost = 0
 
     while running:
         for event in pygame.event.get():
@@ -292,11 +305,23 @@ async def main():
 
         screen.fill("black")
 
+        # switch ghosts based on keys 1-4
+        if pygame.key.get_just_pressed()[pygame.K_1]:
+            active_ghost = 0
+        if pygame.key.get_just_pressed()[pygame.K_2]:
+            active_ghost = 1
+        if pygame.key.get_just_pressed()[pygame.K_3]:
+            active_ghost = 2
+        if pygame.key.get_just_pressed()[pygame.K_4]:
+            active_ghost = 3
+
         # draw maze
         if pygame.key.get_just_pressed()[pygame.K_SPACE]:
             maze_og_toggle = not maze_og_toggle
         if pygame.key.get_just_pressed()[pygame.K_a]:
-            config.ghost_speed = 0 if config.ghost_speed == original_speed else original_speed
+            config.ghost_speed = (
+                0 if config.ghost_speed == original_speed else original_speed
+            )
 
         img_to_use = maze.maze_og_img if maze_og_toggle else maze.img
         divisor = 8.0 if maze_og_toggle else 1.0
@@ -309,11 +334,9 @@ async def main():
         )
         screen.blit(final_img, maze.rect)
 
-        ghosts[0].draw_points(screen)
-
-        for ghost in ghosts:
-            ghost.ai()
-            ghost.draw(screen)
+        ghosts[active_ghost].draw_points(screen)
+        ghosts[active_ghost].ai()
+        ghosts[active_ghost].draw(screen)
 
         pygame.display.flip()
         # print(pygame.mouse.get_pos())
