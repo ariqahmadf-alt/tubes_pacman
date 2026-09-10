@@ -457,7 +457,7 @@ class Ghost:
 
 # initialize ghosts
 ghosts = []
-ghosts.append(Ghost(maze.points[4][6], "blinky", 2))
+ghosts.append(Ghost(maze.points[1][1], "blinky", 2))
 ghosts.append(Ghost(maze.points[1][26], "pinky", 1))
 ghosts.append(Ghost(maze.points[29][26], "inky", 0))
 ghosts.append(Ghost(maze.points[29][1], "clyde", 3))
@@ -487,28 +487,23 @@ async def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            elif event.type == pygame.KEYUP:
+                if event.key == pygame.K_1:
+                    active_ghost = 1
+                if event.key == pygame.K_2:
+                    active_ghost = 2
+                if event.key == pygame.K_3:
+                    active_ghost = 3
+                if event.key == pygame.K_4:
+                    active_ghost = 4
+                if event.key == pygame.K_m:
+                    maze_og_toggle = not maze_og_toggle
+                if event.key == pygame.K_SPACE:
+                    config.ghost_speed = (
+                        0 if config.ghost_speed == original_speed else original_speed
+                    )
 
         screen.fill("black")
-
-        # switch ghosts based on keys 1-4
-        if pygame.key.get_just_pressed()[pygame.K_1]:
-            active_ghost = 0
-        if pygame.key.get_just_pressed()[pygame.K_2]:
-            active_ghost = 1
-        if pygame.key.get_just_pressed()[pygame.K_3]:
-            active_ghost = 2
-        if pygame.key.get_just_pressed()[pygame.K_4]:
-            active_ghost = 3
-        if pygame.key.get_just_pressed()[pygame.K_4]:
-            active_ghost = 4
-
-        # draw maze
-        if pygame.key.get_just_pressed()[pygame.K_SPACE]:
-            maze_og_toggle = not maze_og_toggle
-        if pygame.key.get_just_pressed()[pygame.K_a]:
-            config.ghost_speed = (
-                0 if config.ghost_speed == original_speed else original_speed
-            )
 
         img_to_use = maze.maze_og_img if maze_og_toggle else maze.img
         divisor = 8.0 if maze_og_toggle else 1.0
