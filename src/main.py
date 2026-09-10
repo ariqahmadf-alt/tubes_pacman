@@ -8,6 +8,8 @@ import maze
 import heapq
 from itertools import count
 
+from collections import deque
+
 path = [(0, 0), (0, 1), (0, 2), (0, 3)]
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -85,9 +87,9 @@ class Ghost:
 
             # process AI based on type
             match self.ai_type:
-                case 0:
-                    self.path = []
-                    self.dummy(self.last_point, pygame.mouse.get_pos())
+                # case 0:
+                #     self.path = []
+                #     self.dummy(self.last_point, pygame.mouse.get_pos())
                 case 1:
                     self.path = []
                     self.queue = []
@@ -116,12 +118,25 @@ class Ghost:
                     self.path = []
                     self.queue = []
                     self.queue_curr = 0
-                
+
                     if hasattr(self, "target_point"):
                         del self.target_point
-                
+
                     self.greedy_explore(self.last_point)
-                
+
+                    if hasattr(self, "target_point"):
+                        self.ucs_path(self.target_point)
+                        self.path.reverse()
+                case 0:
+                    self.path = []
+                    self.queue = []
+                    self.queue_curr = 0
+
+                    if hasattr(self, "target_point"):
+                        del self.target_point
+
+                    self.bfs_explore(self.last_point)
+
                     if hasattr(self, "target_point"):
                         self.ucs_path(self.target_point)
                         self.path.reverse()
@@ -276,6 +291,37 @@ class Ghost:
                         frontier,
                         (heuristic(neighbor), next(tie_breaker), new_cost, neighbor),
                     )
+
+    def bfs_explore(self, start):
+        frontier = deque([start])
+        target_pos = pygame.mouse.get_pos()
+
+        start.prio = 0
+        self.queue = []
+
+        while frontier:
+            point = frontier.popleft()
+            self.queue.append(point)
+
+            if dist(target_pos, point.spos()) < 10:
+                self.target_point = point
+                return
+
+            neighbors = (
+                getattr(point, "right", None),
+                getattr(point, "left", None),
+                getattr(point, "top", None),
+                getattr(point, "bottom", None),
+            )
+
+            for neighbor in neighbors:
+                if neighbor is None or neighbor.prio != -1:
+                    continue
+
+                neighbor.prio = point.prio + 1
+                frontier.append(neighbor)
+        
+    
 
     def ucs_path(self, point):
         next_point = point
