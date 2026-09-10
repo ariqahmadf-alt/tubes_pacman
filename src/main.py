@@ -10,16 +10,13 @@ from itertools import count
 
 from collections import deque
 
-path = [(0, 0), (0, 1), (0, 2), (0, 3)]
-
 ROOT = os.path.dirname(os.path.abspath(__file__))
-
 original_speed = config.ghost_speed
-
 
 def dist(p1, p2):
     return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
-
+window_size = (720, 800)
+lsat_target_point = {}
 
 class Ghost:
     pos = pygame.Vector2(0, 0)
@@ -43,6 +40,7 @@ class Ghost:
         self.sprites = []
         self.last_point = point
         self.ai_type = ai_type
+        self.last_target_point = point
         for i in range(4):
             sprite = pygame.image.load(f"{ROOT}/assets/{name}/{name}_{i}.png")
             self.sprites.append(sprite)
@@ -454,6 +452,23 @@ class Ghost:
                 # use different color if this point is in the expanded list
                 # pygame.draw.circle(screen, col, pos, 3, 5)
 
+    def stats(self, screen):
+        font = pygame.font.SysFont("Arial", 24)
+        self.stat("Expanded:", len(self.queue), 10, screen, font)
+        path_cost = "-"
+        if len(self.path) > 0:
+            path_cost = self.path[len(self.path)-1].prio
+        self.stat("Path Cost:", path_cost, 50, screen, font)
+
+    def stat(self, left_str, right_str, y, screen, font):
+        text_surface = font.render(left_str, True, (255, 255, 255))
+        text_rect = text_surface.get_rect(topleft=(570, y))
+        screen.blit(text_surface, text_rect)
+
+        text_surface = font.render(str(right_str), True, (255, 255, 255))
+        text_rect = text_surface.get_rect(topright=(window_size[0] - 10, y))
+        screen.blit(text_surface, text_rect)
+
 
 # initialize ghosts
 ghosts = []
@@ -477,7 +492,7 @@ def draw_points(screen):
 
 async def main():
     pygame.init()
-    screen = pygame.display.set_mode((800, 800))
+    screen = pygame.display.set_mode((int(window_size[0]), int(window_size[1])))
     clock = pygame.time.Clock()
     running = True
     maze_og_toggle = True
@@ -522,6 +537,7 @@ async def main():
             ghosts[active_ghost].draw_points(screen)
             ghosts[active_ghost].ai()
             ghosts[active_ghost].draw(screen)
+            ghosts[active_ghost].stats(screen)
         else:
             draw_points(screen)
             for ghost in ghosts:
